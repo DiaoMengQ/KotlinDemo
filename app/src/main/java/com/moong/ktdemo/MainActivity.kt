@@ -1,13 +1,21 @@
 package com.moong.ktdemo
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
+import android.view.View
+import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.moong.ktdemo.model.User
-import com.moong.ktdemo.utils.toast
+import com.moong.ktdemo.utils.AppPermissionManager
+import com.moong.ktdemo.utils.requestPermission
+import com.moong.ktdemo.utils.showToast
+import com.squareup.picasso.Picasso
+
 
 /* Top-level (顶级声明) */
 // 静态：在类以外定义的变量和方法，不属于任何一个类，而是直接属于package，可直接使用
@@ -15,7 +23,8 @@ import com.moong.ktdemo.utils.toast
 // 编译器在编译的时候就知道 这个变量在实际运行时的每个调用出的实际值
 private const val TAG: String = "KTDemo"
 
-class MainActivity : AppCompatActivity() {
+
+class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var context: Context? = null
 
     private fun printDebug(str: String) {
@@ -39,6 +48,8 @@ class MainActivity : AppCompatActivity() {
     // kt要求定义变量时一定不可为空
     // 在确定后面一定会初始化的场景，可加关键字 lateinit 表示稍后初始化，跳过检查
     lateinit var etUserName: EditText
+    lateinit var btnLogin: Button
+    lateinit var ivTempImg: ImageView
 
     // 确实不知道该值是否为空的情况，可以加一个问号表示可空
     var unKnownStr: String? = null
@@ -63,10 +74,32 @@ class MainActivity : AppCompatActivity() {
         /*使用单例模式*/
         var singleStr = SingleTest.str
         SingleTest.printStr()
+
+        // 动态申请权限
+        requestPermission(this)
     }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        AppPermissionManager(this).onRequestPermissionsResult(
+            requestCode,
+            permissions,
+            grantResults
+        )
+    }
+
 
     private fun initUI() {
         etUserName = findViewById(R.id.et_userName)
+        btnLogin = findViewById(R.id.btn_login)
+        ivTempImg = findViewById(R.id.iv_temp)
+
+        btnLogin.setOnClickListener(this)
     }
 
     /* 带返回值的方法 */
@@ -76,6 +109,10 @@ class MainActivity : AppCompatActivity() {
 
     /* 不带返回值的方法 */
     private fun initData() {
+        Log.d(TAG, "initData: 加载图片")
+        Picasso.get().load("https://wx4.sinaimg.cn/large/9f31b0f0ly1h2xkcoeaytj20jp0jpdgv.jpg")
+            .into(ivTempImg)
+
         var user1: User = User("0001", "张三")
         var user2 = User("0002", "张三2")
 
@@ -121,11 +158,20 @@ class MainActivity : AppCompatActivity() {
         // 不可以写成 keyCode+“”
         printDebug("" + keyCode)
         if (keyCode == KeyEvent.KEYCODE_3) {
-            context?.let { toast(it, "press Number 3") }
+            context?.let { showToast(it, "press Number 3") }
             // toast(this, "press Button 3")
         }
 
         return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onClick(view: View?) {
+        when (view?.id) {
+            R.id.btn_login -> {
+                val intent2img = Intent(this, ImgShowActivity::class.java)
+                startActivity(intent2img)
+            }
+        }
     }
 
 }

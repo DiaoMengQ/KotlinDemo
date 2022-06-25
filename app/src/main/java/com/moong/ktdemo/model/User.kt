@@ -16,10 +16,6 @@ class User {
     private var gender: Int? = null
 
     private var age = 0
-        get() = field
-        set(value) {
-            field = value
-        }
 
     constructor(userId: String, userName: String) {
         this.userId = userId

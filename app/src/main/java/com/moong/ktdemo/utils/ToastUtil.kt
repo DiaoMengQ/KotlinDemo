@@ -5,7 +5,7 @@ import android.widget.Toast
 
 private var myToast: Toast? = null
 
-fun toast(context: Context, text: String) {
+fun showToast(context: Context, text: String) {
     if (myToast != null) {
         myToast?.cancel()
     }
